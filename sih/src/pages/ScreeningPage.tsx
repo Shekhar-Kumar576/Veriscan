@@ -35,6 +35,7 @@ const DOC_TYPES: { value: DocumentType; label: string }[] = [
   { value: "national_id", label: "National ID Card" },
   { value: "driving_license", label: "Driving License" },
   { value: "border_permit", label: "Border Permit" },
+  { value: "student_id", label: "Student ID Card" },
 ];
 
 const DEMO_SCENARIOS = [

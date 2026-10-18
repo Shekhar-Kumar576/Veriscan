@@ -1,4 +1,4 @@
-import { Bell, Sun, Moon, Shield, ChevronRight } from "lucide-react";
+import { Bell, Sun, Moon, Shield, ChevronRight, LogOut } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
@@ -10,7 +10,7 @@ interface TopBarProps {
 
 export default function TopBar({ breadcrumbs }: TopBarProps) {
   const { isDark, toggle } = useTheme();
-  const { isDemoMode } = useAuth();
+  const { isDemoMode, logout } = useAuth();
   const navigate = useNavigate();
   const { notifications } = useScreenings();
   const unread = notifications.filter((n) => !n.read).length;
@@ -59,6 +59,15 @@ export default function TopBar({ breadcrumbs }: TopBarProps) {
           {unread > 0 && (
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-destructive" />
           )}
+        </button>
+
+        <button
+          onClick={() => { logout(); navigate("/"); }}
+          className="flex items-center gap-1.5 h-8 px-2.5 ml-1 rounded text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+          title="Sign out"
+        >
+          <LogOut size={14} />
+          <span className="hidden sm:inline">Sign out</span>
         </button>
       </div>
     </header>

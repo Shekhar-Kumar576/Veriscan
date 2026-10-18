@@ -17,7 +17,9 @@ export type DocumentType =
   | "visa"
   | "national_id"
   | "driving_license"
-  | "border_permit";
+  | "border_permit"
+  | "student_id"
+  | "other";
 
 export type RiskLevel = "clear" | "low" | "medium" | "high" | "critical";
 

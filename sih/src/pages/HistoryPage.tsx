@@ -14,7 +14,7 @@ export default function HistoryPage() {
   const [searchParams] = useSearchParams();
   const focusId = searchParams.get("id");
   const navigate = useNavigate();
-  const { screenings } = useScreenings();
+  const { screenings, clearHistory } = useScreenings();
 
   const [search, setSearch] = useState("");
   const [riskFilter, setRiskFilter] = useState<RiskLevel | "all">("all");
@@ -61,10 +61,15 @@ export default function HistoryPage() {
             <h1 className="text-2xl sm:text-3xl font-bold font-display text-foreground tracking-tight">Screening History</h1>
             <p className="text-sm text-muted-foreground">{filtered.length} records</p>
           </div>
+          <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={() => { if (confirm("Delete all screening history and notifications? This cannot be undone.")) clearHistory(); }} className="flex items-center gap-2 px-3 py-2 border border-destructive/40 bg-card text-sm text-destructive hover:bg-destructive/10 rounded transition-all">
+            Clear History
+          </button>
           <button onClick={() => downloadCsv("screening-history", screeningsToCsv(filtered))} className="flex items-center gap-2 px-3 py-2 border border-border bg-card text-sm text-muted-foreground hover:text-foreground rounded transition-all">
             <Download size={14} />
             Export CSV
           </button>
+          </div>
         </div>
 
         {/* Filters */}

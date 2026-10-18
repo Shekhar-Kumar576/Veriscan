@@ -6,6 +6,7 @@ import { MOCK_NOTIFICATIONS } from "../data/mockData";
 interface ScreeningState {
   screenings: ScreeningResult[];
   recordScreening: (screening: ScreeningResult) => ScreeningResult;
+  clearHistory: () => void;
   notifications: Notification[];
   setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
@@ -55,7 +56,7 @@ export function ScreeningProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ScreeningContext.Provider value={{ screenings, recordScreening, notifications, setNotifications }}>
+    <ScreeningContext.Provider value={{ screenings, recordScreening, clearHistory: () => { setScreenings([]); setNotifications([]); }, notifications, setNotifications }}>
       {children}
     </ScreeningContext.Provider>
   );
