@@ -1,268 +1,165 @@
-import { useNavigate } from "react-router-dom";
-import {
-  ScanLine,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  TrendingUp,
-  Shield,
-  Activity,
-  ChevronRight,
-  Flame,
-} from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import { CHECKPOINT_STATS } from "../data/mockData";
-import { useScreenings } from "../context/ScreeningContext";
-import { RiskBadge, StatusBadge, ScoreMeter } from "../components/ui/Badge";
-import TopBar from "../components/layout/TopBar";
+import React, { useState } from 'react';
+import { UploadCloud, ShieldAlert, CheckCircle2, AlertTriangle, FileText, Trash2 } from 'lucide-react';
+import { useScanStore } from '../store/useScanStore';
+import { Header } from '../components/Header';
 
-export default function DashboardPage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { screenings, notifications } = useScreenings();
-
-  const todayScreenings = screenings.slice(0, 5);
-  const unread = notifications.filter((n) => !n.read);
-  const critical = screenings.filter((s) => s.riskLevel === "critical" || s.riskLevel === "high");
-
-  const stats = [
-    {
-      label: "Today's Screenings",
-      value: "892",
-      delta: "+12.4%",
-      positive: true,
-      icon: <ScanLine size={18} />,
-      sub: "vs. yesterday",
-      glow: "stat-cyan",
-    },
-    {
-      label: "Flagged Cases",
-      value: "47",
-      delta: "5.3% rate",
-      positive: false,
-      icon: <AlertTriangle size={18} />,
-      sub: "require review",
-      glow: "stat-magenta",
-    },
-    {
-      label: "Verified Documents",
-      value: "845",
-      delta: "94.7%",
-      positive: true,
-      icon: <CheckCircle2 size={18} />,
-      sub: "clearance rate",
-      glow: "stat-violet",
-    },
-    {
-      label: "Pending Reviews",
-      value: screenings.filter((screening) => screening.status === "pending" || screening.status === "flagged").length.toString(),
-      delta: "Live queue",
-      positive: false,
-      icon: <Clock size={18} />,
-      sub: "awaiting decision",
-      glow: "stat-blue",
-    },
-  ];
-
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+export const DashboardPage: React.FC = () => {
+  const { currentScan, screeningHistory, clearAllHistory } = useScanStore();
+  const [selectedDocType, setSelectedDocType] = useState('aadhaar');
 
   return (
-    <div>
-      <TopBar breadcrumbs={[{ label: "Dashboard" }]} />
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-        {/* Welcome */}
-        <div className="cyber-hero relative overflow-hidden rounded-3xl border border-cyan-500/20 p-6 sm:p-8">
-          <div className="hero-grid" aria-hidden="true" />
-          <div className="hero-beam" aria-hidden="true" />
-          <div className="relative z-10 flex items-start justify-between flex-wrap gap-6">
-          <div className="max-w-2xl">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-400 mb-2">Operational overview</div>
-            <h1 className="text-3xl sm:text-4xl font-bold font-display text-foreground tracking-tight">
-              {greeting}, {user?.name.split(" ")[0]}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              {user?.checkpoint} · {user?.badgeNumber} ·{" "}
-              {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+    <div className="min-h-screen bg-[#080B12] text-slate-100 flex flex-col font-sans">
+      <Header />
+
+      <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+        {/* Screening Stats Header */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span className="text-xs text-slate-500 font-medium">Session Screenings</span>
+            <p className="text-2xl font-bold text-slate-100 mt-1">{screeningHistory.length}</p>
+          </div>
+          <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span className="text-xs text-slate-500 font-medium">Clear / Verified</span>
+            <p className="text-2xl font-bold text-emerald-400 mt-1">
+              {screeningHistory.filter((s) => s.verdict === 'Clear').length}
             </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <span className="status-chip"><span className="status-dot" /> Secure network online</span>
-              <span className="status-chip text-violet-300">AI pipeline ready</span>
-            </div>
           </div>
-          <div className="flex gap-2 self-center">
-            <button
-              onClick={() => navigate("/screening")}
-              className="glow-button inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary via-blue-500 to-cyan-500 text-primary-foreground font-semibold rounded-xl text-sm hover:-translate-y-1 transition-all"
-            >
-              <ScanLine size={15} />
-              New Screening
-            </button>
-          </div>
+          <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span className="text-xs text-slate-500 font-medium">Flagged / Forgeries</span>
+            <p className="text-2xl font-bold text-rose-400 mt-1">
+              {screeningHistory.filter((s) => s.verdict !== 'Clear').length}
+            </p>
           </div>
         </div>
 
-        {/* Alert banner */}
-        {critical.length > 0 && (
-          <div
-            onClick={() => navigate("/notifications")}
-            className="flex items-center gap-3 p-3.5 bg-red-500/10 border border-red-500/30 rounded cursor-pointer hover:bg-red-500/15 transition-all"
-          >
-            <Flame size={16} className="text-red-400 shrink-0" />
-            <div className="flex-1">
-              <span className="text-sm font-semibold text-red-400">{critical.length} critical/high-risk case{critical.length > 1 ? "s" : ""} require attention</span>
-              <span className="text-xs text-muted-foreground ml-2">Latest: {critical[0].subjectName}</span>
-            </div>
-            <ChevronRight size={14} className="text-red-400 shrink-0" />
-          </div>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((s) => (
-            <div key={s.label} className={`stat-card ${s.glow} group bg-card/75 backdrop-blur-xl border border-border rounded-2xl p-5`}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 rounded-xl bg-primary/10 text-cyan-400 group-hover:bg-primary/20 transition-colors">{s.icon}</div>
-                <span className={`text-xs font-mono font-medium ${s.positive ? "text-success" : "text-warning"}`}>
-                  {s.delta}
-                </span>
-              </div>
-              <div className="text-3xl font-bold font-mono text-foreground tracking-tight">{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-              <div className="text-[10px] text-muted-foreground/70 mt-0.5">{s.sub}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {/* Recent screenings */}
-          <div className="md:col-span-2 bg-card/80 backdrop-blur border border-border rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <Activity size={15} className="text-muted-foreground" />
-                Recent Screenings
-              </div>
-              <button
-                onClick={() => navigate("/history")}
-                className="text-xs text-primary dark:text-accent hover:underline flex items-center gap-1"
+        {/* Upload & Active Screen Zone */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Upload Area */}
+          <div className="lg:col-span-7 bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-slate-200">Submit Document For Analysis</h2>
+              <select
+                value={selectedDocType}
+                onChange={(e) => setSelectedDocType(e.target.value)}
+                className="bg-slate-800 text-xs text-slate-300 rounded-lg px-3 py-1.5 border border-slate-700 outline-none"
               >
-                View all <ChevronRight size={11} />
+                <option value="aadhaar">Aadhaar Card</option>
+                <option value="pan">PAN Card</option>
+                <option value="voter_id">Voter ID Card</option>
+                <option value="student_id">Student ID Card</option>
+                <option value="passport">Passport</option>
+              </select>
+            </div>
+
+            <div className="border-2 border-dashed border-slate-700/80 hover:border-cyan-500/70 rounded-xl p-10 flex flex-col items-center justify-center text-center transition-colors cursor-pointer bg-slate-950/40 group">
+              <div className="h-12 w-12 rounded-full bg-slate-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <UploadCloud className="h-6 w-6 text-cyan-400" />
+              </div>
+              <p className="mt-4 text-sm font-medium text-slate-200">Drag and drop document scan or image</p>
+              <p className="text-xs text-slate-500 mt-1">JPEG, PNG, WEBP, or PDF up to 10MB</p>
+              <button className="mt-4 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-xs font-semibold text-white shadow-md shadow-cyan-500/20">
+                Browse Files
               </button>
             </div>
-            <div className="divide-y divide-border">
-              {todayScreenings.map((s) => (
-                <div
-                  key={s.id}
-                  onClick={() => navigate(`/history?id=${s.id}`)}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-secondary/50 cursor-pointer transition-all group"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-foreground truncate">{s.subjectName}</span>
-                      <span className="text-[10px] font-mono text-muted-foreground shrink-0">{s.documentNumber}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
-                      <span className="capitalize">{s.documentType.replace("_", " ")}</span>
-                      <span>·</span>
-                      <span>{new Date(s.submittedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>
-                    </div>
-                  </div>
-                  <div className="shrink-0 flex items-center gap-2">
-                    <RiskBadge level={s.riskLevel} size="sm" />
-                    <ChevronRight size={12} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
-          {/* Right column */}
-          <div className="space-y-4">
-            {/* Notifications */}
-            <div className="bg-card/80 backdrop-blur border border-border rounded-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
-                <span className="text-sm font-semibold text-foreground">Notifications</span>
-                <button
-                  onClick={() => navigate("/notifications")}
-                  className="text-xs text-primary dark:text-accent hover:underline"
-                >
-                  See all
-                </button>
-              </div>
-              <div className="divide-y divide-border">
-                {unread.slice(0, 3).map((n) => (
-                  <div
-                    key={n.id}
-                    onClick={() => navigate("/notifications")}
-                    className="px-4 py-3 hover:bg-secondary/50 cursor-pointer transition-all"
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                        n.type === "alert" ? "bg-red-400" :
-                        n.type === "warning" ? "bg-orange-400" :
-                        n.type === "success" ? "bg-emerald-400" : "bg-blue-400"
-                      }`} />
-                      <div>
-                        <div className="text-xs font-medium text-foreground leading-tight">{n.title}</div>
-                        <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{n.message}</div>
-                      </div>
-                    </div>
+          {/* Active Result View / Empty Slate */}
+          <div className="lg:col-span-5 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 flex flex-col">
+            <h2 className="text-base font-semibold text-slate-200 mb-4">Verification Verdict</h2>
+            {currentScan ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-slate-400 uppercase font-semibold">Integrity Score</span>
+                    <p className="text-2xl font-bold mt-0.5">{currentScan.riskScore}/100</p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Checkpoint overview */}
-            <div className="bg-card/80 backdrop-blur border border-border rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3.5 border-b border-border">
-                <Shield size={14} className="text-muted-foreground" />
-                <span className="text-sm font-semibold text-foreground">Top Checkpoints</span>
-              </div>
-              <div className="p-4 space-y-3">
-                {CHECKPOINT_STATS.slice(0, 4).map((cp) => (
-                  <div key={cp.name}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-muted-foreground truncate">{cp.name}</span>
-                      <span className="text-xs font-mono font-medium text-foreground">{cp.total}</span>
-                    </div>
-                    <ScoreMeter score={Math.round((cp.cleared / cp.total) * 100)} />
-                  </div>
-                ))}
-                <button
-                  onClick={() => navigate("/analytics")}
-                  className="w-full text-xs text-primary dark:text-accent hover:underline flex items-center justify-center gap-1 mt-1"
-                >
-                  Full analytics <ChevronRight size={11} />
-                </button>
-              </div>
-            </div>
-
-            {/* Quick actions */}
-            <div className="bg-card/80 backdrop-blur border border-border rounded-2xl overflow-hidden">
-              <div className="px-4 py-3.5 border-b border-border">
-                <span className="text-sm font-semibold text-foreground">Quick Actions</span>
-              </div>
-              <div className="p-3 grid grid-cols-2 gap-2">
-                {[
-                  { label: "New Screening", icon: <ScanLine size={13} />, to: "/screening" },
-                  { label: "View History", icon: <Activity size={13} />, to: "/history" },
-                  { label: "Analytics", icon: <TrendingUp size={13} />, to: "/analytics" },
-                  { label: "Alerts", icon: <AlertTriangle size={13} />, to: "/notifications" },
-                ].map((a) => (
-                  <button
-                    key={a.label}
-                    onClick={() => navigate(a.to)}
-                    className="flex items-center gap-2 px-3 py-2 bg-secondary hover:bg-primary/15 text-sm text-muted-foreground hover:text-foreground rounded transition-all"
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      currentScan.verdict === 'Clear'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                    }`}
                   >
-                    {a.icon}
-                    <span className="text-xs">{a.label}</span>
-                  </button>
-                ))}
+                    {currentScan.verdict}
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Tampering Checks</h3>
+                  {currentScan.checks.map((check) => (
+                    <div key={check.id} className="p-2.5 rounded-lg bg-slate-950/40 border border-slate-800 text-xs flex justify-between items-center">
+                      <span className="text-slate-300">{check.name}</span>
+                      <span className={check.status === 'passed' ? 'text-emerald-400' : 'text-rose-400'}>
+                        {check.status.toUpperCase()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-8 border border-slate-800/60 rounded-xl bg-slate-950/30">
+                <FileText className="h-10 w-10 text-slate-600 mb-3" />
+                <p className="text-sm font-medium text-slate-300">Ready for Document Screening</p>
+                <p className="text-xs text-slate-500 mt-1 max-w-xs">
+                  Upload an identity card above to run Vision Forensics, ELA, and TinyFish authority validation.
+                </p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+
+        {/* Screening History Table */}
+        <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-semibold text-slate-200">Recent Screening Activity</h2>
+              <p className="text-xs text-slate-400">All previous logs cleared. New evaluations will appear here.</p>
+            </div>
+            {screeningHistory.length > 0 && (
+              <button
+                onClick={clearAllHistory}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete All</span>
+              </button>
+            )}
+          </div>
+
+          {screeningHistory.length === 0 ? (
+            <div className="py-12 text-center text-slate-500 text-xs">
+              No recent screenings found. All historical candidate databases wiped clean.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-800 text-slate-400">
+                    <th className="pb-3 font-semibold">Timestamp</th>
+                    <th className="pb-3 font-semibold">Type</th>
+                    <th className="pb-3 font-semibold">Risk Score</th>
+                    <th className="pb-3 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {screeningHistory.map((item) => (
+                    <tr key={item.id}>
+                      <td className="py-3 text-slate-400">{item.timestamp}</td>
+                      <td className="py-3 text-slate-200">{item.documentType}</td>
+                      <td className="py-3 font-mono">{item.riskScore}/100</td>
+                      <td className="py-3">
+                        <span className={item.verdict === 'Clear' ? 'text-emerald-400' : 'text-rose-400'}>
+                          {item.verdict}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
-}
+};

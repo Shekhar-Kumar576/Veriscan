@@ -1,202 +1,107 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ShieldCheck, Eye, EyeOff, AlertCircle, Loader2, Users } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import type { UserRole } from "../types";
+import React, { useState } from 'react';
+import { ShieldCheck, Lock, Mail, ArrowRight } from 'lucide-react';
 
-const DEMO_ROLES: { role: UserRole; label: string; desc: string; email: string }[] = [
-  { role: "officer", label: "Border Officer", desc: "Screen documents at checkpoint", email: "officer@ssb.gov.in" },
-  { role: "supervisor", label: "Supervisor", desc: "Review flagged cases & approve", email: "supervisor@ssb.gov.in" },
-  { role: "admin", label: "Administrator", desc: "System management & reports", email: "admin@ssb.gov.in" },
-];
+export const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-export default function LoginPage() {
-  const navigate = useNavigate();
-  const { login, loginAsDemo } = useAuth();
-  const [email, setEmail] = useState("officer@ssb.gov.in");
-  const [password, setPassword] = useState("Demo@1234");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    if (!email.trim()) { setError("Email is required."); return; }
-    if (!password.trim()) { setError("Password is required."); return; }
-    setLoading(true);
-    const ok = await login(email.trim(), password.trim());
-    setLoading(false);
-    if (ok) {
-      navigate("/dashboard");
-    } else {
-      setError("Invalid credentials. Use Demo@1234 with any demo account.");
-    }
-  };
-
-  const handleDemo = (role: UserRole) => {
-    loginAsDemo(role);
-    navigate("/dashboard");
+    localStorage.removeItem('veriscan_history');
+    localStorage.removeItem('truthlens_history');
+    localStorage.setItem('auth_token', 'session_active');
+    window.location.href = '/dashboard';
   };
 
   return (
-    <div className="auth-shell min-h-screen bg-background flex overflow-hidden relative">
-      {/* Left panel */}
-      <div className="auth-visual hidden lg:flex w-1/2 flex-col justify-between p-10 relative overflow-hidden">
-        <div className="auth-grid" aria-hidden="true" />
-        <div className="auth-orbit auth-orbit-one" aria-hidden="true" />
-        <div className="auth-orbit auth-orbit-two" aria-hidden="true" />
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded bg-primary-foreground/20 flex items-center justify-center">
-            <ShieldCheck size={18} className="text-primary-foreground" />
-          </div>
-          <div>
-            <div className="text-primary-foreground font-bold font-display">VeriScan AI</div>
-            <div className="text-primary-foreground/60 text-[10px] uppercase tracking-widest">Ministry of Home Affairs · SSB</div>
-          </div>
-        </div>
+    <div className="min-h-screen w-full bg-[#080B12] text-slate-100 flex flex-col md:flex-row antialiased">
+      {/* Left Branding Column */}
+      <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-800/80 bg-gradient-to-br from-[#0E1726] via-[#090D17] to-[#06080F]">
         <div>
-          <div className="text-5xl font-bold font-display text-primary-foreground leading-tight mb-5 tracking-tight">
-            Securing India's borders with<br />
-            <span className="gradient-text">intelligent verification</span>
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+              <ShieldCheck className="h-6 w-6 text-white stroke-[2.2]" />
+            </div>
+            <div>
+              <span className="text-xl font-bold tracking-tight text-white">VeriScan AI</span>
+              <span className="block text-[11px] font-medium text-cyan-400/90 tracking-wide uppercase">Inspection Suite</span>
+            </div>
           </div>
-          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-sm">
-            AI-Based Fake Identity & Document Screening System for Sashastra Seema Bal border checkpoints.
-          </p>
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            {[
-              { value: "47+", label: "SSB Checkpoints" },
-              { value: "99.2%", label: "Detection Accuracy" },
-              { value: "&lt;15s", label: "Screening Time" },
-              { value: "24/7", label: "AI Monitoring" },
-            ].map((s) => (
-              <div key={s.label} className="auth-stat bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-4 backdrop-blur">
-                <div className="text-xl font-bold font-mono text-primary-foreground" dangerouslySetInnerHTML={{ __html: s.value }} />
-                <div className="text-xs text-primary-foreground/60 mt-0.5">{s.label}</div>
-              </div>
-            ))}
+
+          <div className="mt-20 max-w-lg">
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-[1.15] text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400">
+              AI-Powered Identity &amp; Document Screening
+            </h1>
+            <p className="mt-6 text-slate-400 text-sm md:text-base leading-relaxed">
+              Automated document validation and anti-forgery detection. Analyzes physical wear, digital manipulation, recapture artifacts, and real-time issuer records.
+            </p>
           </div>
         </div>
-        <div className="text-xs text-primary-foreground/40">
-          Government of India · Smart India Hackathon 2026 · PS 26188
+
+        <div className="my-10 md:my-0">
+          <div className="grid grid-cols-2 gap-3 text-left">
+            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Detection Pipeline</span>
+              <p className="text-sm font-semibold text-slate-200 mt-1">Multi-Signal Vision &amp; ELA</p>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Authority Verification</span>
+              <p className="text-sm font-semibold text-slate-200 mt-1">Live Web Cross-Reference</p>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 mt-6 font-mono">VeriScan Core v2.4 &bull; Production Engine</p>
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(139,92,246,0.12),transparent_35%)] pointer-events-none" />
-        <div className="auth-card relative w-full max-w-md border border-border bg-card/65 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl">
-          {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-2.5 mb-8">
-            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
-              <ShieldCheck size={18} className="text-primary-foreground" />
-            </div>
-            <div className="font-bold font-display text-foreground">VeriScan AI</div>
+      {/* Right Login Box */}
+      <div className="w-full md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-[#080B12]">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white tracking-tight">Console Access</h2>
+            <p className="text-sm text-slate-400 mt-1">Enter your credentials to begin identity screening.</p>
           </div>
 
-          <h1 className="text-2xl font-bold font-display text-foreground mb-1">Sign in</h1>
-          <p className="text-sm text-muted-foreground mb-7">
-            Access your SSB screening dashboard.{" "}
-            <Link to="/" className="text-primary dark:text-accent hover:underline">Back to home</Link>
-          </p>
-
-          {/* Demo quick-login */}
-          <div className="mb-5 p-4 bg-gradient-to-br from-violet-500/10 to-cyan-500/5 border border-violet-500/25 rounded-2xl">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-accent mb-2.5">
-              <Users size={12} />
-              Quick Demo Login
-            </div>
-            <div className="flex gap-2">
-              {DEMO_ROLES.map((r) => (
-                <button
-                  key={r.role}
-                  onClick={() => handleDemo(r.role)}
-                  className="flex-1 text-center py-2 text-[10px] font-medium rounded-xl border border-violet-400/25 text-violet-300 hover:bg-violet-500/15 hover:border-violet-400/50 transition-all capitalize"
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative mb-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-card px-3 text-xs text-muted-foreground">or sign in with credentials</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded text-xs text-destructive">
-                <AlertCircle size={13} className="mt-0.5 shrink-0" />
-                {error}
-              </div>
-            )}
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1.5">
-                Official Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="username@ssb.gov.in"
-                className="w-full px-3 py-2.5 bg-card border border-border rounded text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-                autoComplete="email"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-foreground mb-1.5">
-                Password
-              </label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Officer Email</label>
               <div className="relative">
+                <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="email"
+                  required
+                  placeholder="analyst@agency.gov"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Security Key</label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+                <input
+                  type="password"
+                  required
+                  placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full px-3 py-2.5 pr-10 bg-card border border-border rounded text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-                  autoComplete="current-password"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm transition-all"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
               </div>
             </div>
-            <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Forgot password?
-              </Link>
-            </div>
+
             <button
               type="submit"
-              disabled={loading}
-              className="glow-button w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-violet-600 via-blue-500 to-cyan-500 text-primary-foreground font-semibold rounded-xl text-sm disabled:opacity-60 transition-all"
+              className="w-full mt-2 py-3 px-4 rounded-lg font-medium text-sm text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:via-blue-500 hover:to-indigo-500 transition-all duration-200 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 group cursor-pointer"
             >
-              {loading ? <Loader2 size={15} className="animate-spin" /> : null}
-              {loading ? "Authenticating..." : "Sign In"}
+              <span>Authenticate &amp; Launch</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </form>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            New officer?{" "}
-            <Link to="/register" className="text-primary dark:text-accent hover:underline">
-              Request account access
-            </Link>
-          </p>
-
-          <div className="mt-6 text-center text-[10px] text-muted-foreground">
-            Authorized personnel only · Unauthorized access is a criminal offence under IT Act 2000
-          </div>
         </div>
       </div>
     </div>
   );
-}
+};
