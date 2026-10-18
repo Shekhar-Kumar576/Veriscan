@@ -3,7 +3,18 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 
-import siteConfiguration from './.figma/make/site.json'
+// Inlined so the build works without the hidden .figma folder (e.g. on Vercel)
+const siteConfiguration = {
+  "description": "Enables users to solve SIH 26188 problem with AI-driven analysis, data management, and actionable insights via a secure, responsive GovTech platform.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
+
 
 // Vite config — https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
