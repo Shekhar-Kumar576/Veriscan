@@ -34,6 +34,25 @@ function mrzCheck(l2: string) {
   return parts.filter(p => !p[1]).map(p => p[0]);
 }
 
+type Chk = { checkName: string; status: string; confidence: number; soft?: boolean };
+/** Hard checks (vision, MRZ, field rules, editor signature) drive floors; soft checks (ELA, metadata, web) only nudge. */
+function computeRisk(checks: Chk[], o: { flaggedPct: number; matched: boolean; wlConf: number; face: number | null; agent: number | null; webOk: boolean }) {
+  const w = (c: Chk) => (c.soft ? 0.4 : 1);
+  const sev = (c: Chk) => (c.status === 'fail' ? 100 : c.status === 'warning' ? 35 : 0);
+  const tamper = checks.reduce((a, c) => a + sev(c) * w(c), 0) / (checks.reduce((a, c) => a + w(c), 0) || 1);
+  const sig: [number, number][] = [[tamper, 0.45], [o.flaggedPct, 0.15], [o.matched ? (o.wlConf >= 80 ? 100 : 70) : 0, 0.2]];
+  if (o.face !== null) sig.push([o.face, 0.2]);
+  if (o.agent !== null) sig.push([o.agent, 0.2]);
+  let risk = sig.reduce((a, x) => a + x[0] * x[1], 0) / sig.reduce((a, x) => a + x[1], 0);
+  const hard = checks.filter(c => !c.soft), fails = hard.filter(c => c.status === 'fail'), warns = hard.filter(c => c.status === 'warning');
+  if (fails.length) risk = Math.max(risk, fails.some(c => c.confidence >= 80) ? 65 : 55);
+  if (fails.length >= 2) risk = Math.max(risk, 75);
+  if (warns.length >= 3) risk = Math.max(risk, 40);
+  if (o.matched) risk = Math.max(risk, 60);
+  if (o.webOk && !fails.length) risk -= 5;
+  return clamp(risk);
+}
+
 // Rule-based field validation (works for any document type, no MRZ needed)
 function fieldChecks(fields: any[]) {
   const out: { msg: string; hard: boolean }[] = [];
@@ -78,7 +97,7 @@ export async function POST(req: Request) {
 "fields":[{"label":"","value":"exact printed value","confidence":0-100,"flagged":false,"reason":"only if flagged"}],
 "checks":[{"checkName":"Photo Substitution","status":"pass|warning|fail","confidence":0-100,"detail":""},{"checkName":"Font Consistency",...},{"checkName":"Watermark & Security Features",...},{"checkName":"Layout & Template Match",...},{"checkName":"Screen / Print Recapture",...}],
 "face":{"similarity":${body.selfie ? '0-100 similarity of ID photo to selfie' : 'null'},"livenessScore":${body.selfie ? '0-100 chance the selfie is a real live person, not a photo of a photo' : 'null'},"detail":""}}
-Rules: Screen / Print Recapture = FAIL only if the image is a photo of a monitor or phone screen (moire, pixel grid, bezel, window or app interface, cursor) or of a printout/photocopy; a physical plastic card photographed directly, even held in a hand, is normal and PASSES. For ID types that normally carry few security features (student IDs), say so and use pass or warning for Watermark, not fail.` }]);
+Rules: Screen / Print Recapture = FAIL only if the image is a photo of a monitor or phone screen (moire, pixel grid, bezel, window or app interface, cursor) or of a printout/photocopy; a physical plastic card photographed directly, even held in a hand, is normal and PASSES. Never mark a check warning or fail without a specific visible defect that you name in "detail". Transparent tape, lamination, plastic card holders, glare, small creases, fingers, mild blur and a phone-camera date or device stamp are NORMAL wear, not tampering. For ID types that normally carry few security features (student IDs), say so and use pass or warning for Watermark, not fail.` }]);
         if (ex.isDocument === false) throw new Error('This image does not look like an identity document. Please retake it.');
         const KNOWN = ['passport', 'visa', 'national_id', 'driving_license', 'border_permit', 'student_id', 'other'];
         const det = String(ex.detectedType || '').toLowerCase();
@@ -88,19 +107,19 @@ Rules: Screen / Print Recapture = FAIL only if the image is a photo of a monitor
         stage(1);
         const bad = docType === 'passport' ? mrzCheck(ex.mrzLine2) : null;
         const checks: any[] = [...(ex.checks || [])];
-        if (KNOWN.includes(det) && det !== body.docType) checks.push({ checkName: 'Document Type Match', status: 'fail', confidence: 90, detail: `Officer selected "${docLabel}" but the document reads as "${dLabel}".` });
+        if (KNOWN.includes(det) && det !== body.docType) checks.push({ checkName: 'Document Type Match', status: 'warning', soft: true, confidence: 90, detail: `Officer selected "${docLabel}" but the document reads as "${dLabel}". Type was auto-corrected.` });
         const fv = fieldChecks(ex.fields || []);
         checks.push(fv.length ? { checkName: 'Field Format Validation', status: fv.some(x => x.hard) ? 'fail' : 'warning', confidence: 88, detail: fv.map(x => x.msg).join(' ') } : { checkName: 'Field Format Validation', status: 'pass', confidence: 80, detail: 'Dates, phone numbers, e-mail and ID-year consistency passed rule checks.' });
         if (docType === 'passport' || ex.mrzLine2) checks.push(bad === null
-          ? { checkName: 'MRZ Checksum Validation', status: 'warning', confidence: 50, detail: 'No complete 44-character MRZ line was readable, so checksums could not be computed.' }
+          ? { checkName: 'MRZ Checksum Validation', status: 'warning', soft: true, confidence: 50, detail: 'No complete 44-character MRZ line was readable, so checksums could not be computed.' }
           : bad.length === 0 ? { checkName: 'MRZ Checksum Validation', status: 'pass', confidence: 97, detail: 'All ICAO 9303 check digits match the computed values.' }
           : { checkName: 'MRZ Checksum Validation', status: bad.length > 1 ? 'fail' : 'warning', confidence: bad.length > 1 ? 96 : 70, detail: `Check digit mismatch for: ${bad.join(', ')}.${bad.length === 1 ? ' A single mismatch can also be an OCR misread; verify manually.' : ''}` });
 
         stage(2);
         if (f) {
-          checks.push({ checkName: 'Pixel Forensics (ELA)', status: f.hotspot >= 5 ? 'fail' : f.hotspot >= 3.5 ? 'warning' : 'pass', confidence: 68, detail: `Error-level hotspot ratio ${Number(f.hotspot).toFixed(2)}. High local spikes can indicate pasted or re-compressed regions.` });
+          checks.push({ checkName: 'Pixel Forensics (ELA)', status: f.hotspot >= 6 ? 'warning' : 'pass', soft: true, confidence: 60, detail: `Error-level hotspot ratio ${Number(f.hotspot).toFixed(2)}. Informational only: ELA is unreliable on high-contrast text and re-compressed photos.` });
           const ed = !!f.editor;
-          checks.push({ checkName: 'Metadata Integrity', status: ed ? 'fail' : (!f.hasExif && body.source !== 'camera') ? 'warning' : 'pass', confidence: ed ? 93 : 62,
+          checks.push({ checkName: 'Metadata Integrity', status: ed ? 'fail' : (!f.hasExif && body.source !== 'camera') ? 'warning' : 'pass', soft: !ed, confidence: ed ? 93 : 62,
             detail: ed ? `File carries an image-editor signature (${f.editor}).` : body.source === 'camera' ? 'Live camera capture; no file history expected.' : f.hasExif ? 'Camera metadata present and no editor signature found.' : 'Metadata is stripped, which is common in re-saved or edited files.' });
         }
 
@@ -131,8 +150,8 @@ Return ONLY JSON {"issuerExists":true|false|null,"contactMatches":true|false|nul
         (web.evidence || []).slice(0, 4).forEach((e: any) => ev.push(e));
         const contra: string[] = web.contradictions || [];
         checks.push(!text
-          ? { checkName: 'Issuer Web Verification (TinyFish)', status: 'warning', confidence: 45, detail: 'TinyFish found no usable public pages for this issuer, so printed details could not be cross-checked.' }
-          : { checkName: 'Issuer Web Verification (TinyFish)', status: web.issuerExists === false || web.contactMatches === false ? 'fail' : (contra.length || web.format?.valid === false || web.issuerExists !== true) ? 'warning' : 'pass', confidence: 78,
+          ? { checkName: 'Issuer Web Verification (TinyFish)', status: 'warning', soft: true, confidence: 45, detail: 'TinyFish found no usable public pages for this issuer, so printed details could not be cross-checked.' }
+          : { checkName: 'Issuer Web Verification (TinyFish)', status: (web.issuerExists === false || web.contactMatches === false || contra.length || web.format?.valid === false || web.issuerExists !== true) ? 'warning' : 'pass', soft: true, confidence: 70,
               detail: [web.summary, ...contra].filter(Boolean).join(' ') || 'Issuer and printed contact details are consistent with public sources.' });
         let agentRisk: number | null = null;
         if (body.portalUrl) {
@@ -151,19 +170,9 @@ Return ONLY JSON {"issuerExists":true|false|null,"contactMatches":true|false|nul
           : { matched: false, detail: text ? 'No credible public watchlist match found by TinyFish Search + Fetch.' : 'TinyFish found no usable public pages for this subject.' };
 
         stage(5);
-        const tamper = checks.length ? checks.reduce((a, c) => a + (c.status === 'fail' ? 100 : c.status === 'warning' ? 40 : 0), 0) / checks.length : 40;
-        const flagged = (ex.fields || []).length ? (ex.fields as any[]).filter(x => x.flagged).length / ex.fields.length * 100 : 30;
-        const sig: [number, number][] = [[tamper, 0.35], [flagged, 0.15], [matched ? ((wl.confidence ?? 0) >= 80 ? 100 : 70) : 0, 0.2], [web.format?.valid === false ? 70 : web.format?.valid === true ? 0 : 20, 0.1]];
-        if (body.selfie && typeof sim === 'number') sig.push([100 - sim, 0.2]);
-        if (agentRisk !== null) sig.push([agentRisk, 0.2]);
-        let risk = sig.reduce((a, s) => a + s[0] * s[1], 0) / sig.reduce((a, s) => a + s[1], 0);
-        const fails = checks.filter(c => c.status === 'fail'), warns = checks.filter(c => c.status === 'warning');
-        if (fails.length) risk = Math.max(risk, fails.some(c => c.confidence >= 80) ? 65 : 55);
-        if (fails.length >= 2) risk = Math.max(risk, 75);
-        if (warns.length >= 3) risk = Math.max(risk, 40);
-        if (matched) risk = Math.max(risk, 60);
-        if (checks.some(c => c.checkName === 'MRZ Checksum Validation' && c.status === 'fail')) risk = Math.max(risk, 55);
-        risk = clamp(risk);
+        const flaggedPct = (ex.fields || []).length ? (ex.fields as any[]).filter(x => x.flagged).length / ex.fields.length * 100 : 30;
+        const webOk = checks.some(c => c.checkName.startsWith('Issuer Web') && c.status === 'pass');
+        const risk = computeRisk(checks, { flaggedPct, matched, wlConf: wl.confidence ?? 0, face: body.selfie && typeof sim === 'number' ? 100 - sim : null, agent: agentRisk, webOk });
         const riskLevel = risk < 15 ? 'clear' : risk < 35 ? 'low' : risk < 55 ? 'medium' : risk < 75 ? 'high' : 'critical';
         const action = { clear: 'Clear to proceed. Standard entry processing.', low: 'Proceed with routine officer discretion; note minor observations.', medium: 'Refer to secondary screening and verify the flagged items manually.', high: 'Hold subject and escalate to supervisor for manual document examination.', critical: 'Detain for supervisor review. Do not rely on this tool alone; confirm identity through official channels.' }[riskLevel];
         const issues = [...checks.filter(c => c.status !== 'pass').map(c => `${c.checkName}: ${c.detail}`), ...(matched ? [watchlistHit.detail!] : [])];

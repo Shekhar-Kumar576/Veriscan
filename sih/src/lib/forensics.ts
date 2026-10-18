@@ -21,11 +21,10 @@ export async function computeForensics(file: File, src: string) {
     const n = p / 4, bi = Math.floor(n / w / 16) * bw + Math.floor((n % w) / 16);
     bl[bi] += (Math.abs(a[p] - b[p]) + Math.abs(a[p + 1] - b[p + 1]) + Math.abs(a[p + 2] - b[p + 2])) / 3; cn[bi]++;
   }
-  let sum = 0, max = 0;
-  bl.forEach((v, n) => { const m = v / (cn[n] || 1); sum += m; if (m > max) max = m; });
+  const means = Array.from(bl, (v, n) => v / (cn[n] || 1)).sort((x, y) => x - y);
   const head = new TextDecoder("latin1").decode(new Uint8Array(await file.slice(0, 262144).arrayBuffer()));
   return {
-    hotspot: max / (sum / bl.length + 0.5),
+    hotspot: means[Math.floor(0.98 * (means.length - 1))] / (means[Math.floor(means.length / 2)] + 0.5),
     editor: (head.match(/Adobe Photoshop|GIMP|Canva|Pixlr|Affinity|Snapseed|PicsArt|Lightroom/i) || [""])[0],
     hasExif: head.includes("Exif"),
   };
