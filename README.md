@@ -1,53 +1,59 @@
-VeriScan AI
+# VeriScan AI
 
-AI-Powered Identity & Document Screening Platform
+### AI-Powered Identity & Document Screening Platform
 
 <p align="center">
   <b>Verify Smart. Browse Safely. Stay Informed.</b>
-</p><p align="center">
+</p>
+
+<p align="center">
   An AI-powered platform exploring identity screening, document analysis, and safer web navigation.
-</p><p align="center">
+</p>
+
+<p align="center">
   <a href="https://veriscan-seven.vercel.app/">Live Demo</a> •
   <a href="https://github.com/Shekhar-Kumar576/Veriscan">GitHub Repository</a>
-</p>---
-
-Table of Contents
-
-1. "About the Project" (#about-the-project)
-2. "Problem Statement" (#problem-statement)
-3. "Our Solution" (#our-solution)
-4. "Key Features" (#key-features)
-5. "Safe Browsing and Content Redirection" (#safe-browsing-and-content-redirection)
-6. "TinyFish API Integration" (#tinyfish-api-integration)
-7. "How VeriScan Works" (#how-veriscan-works)
-8. "System Architecture" (#system-architecture)
-9. "Technology Stack" (#technology-stack)
-10. "Project Structure" (#project-structure)
-11. "Getting Started" (#getting-started)
-12. "Environment Variables" (#environment-variables)
-13. "Deployment" (#deployment)
-14. "Security and Privacy" (#security-and-privacy)
-15. "Future Scope" (#future-scope)
-16. "Hackathon Experience" (#hackathon-experience)
-17. "Contributing" (#contributing)
-18. "Acknowledgements" (#acknowledgements)
-19. "Contact" (#contact)
+</p>
 
 ---
 
-About the Project
+## Table of Contents
 
-VeriScan AI is an AI-powered identity and document screening platform developed to explore smarter verification workflows and safer digital interactions.
+1. [About the Project](#about-the-project)
+2. [Problem Statement](#problem-statement)
+3. [Our Solution](#our-solution)
+4. [Key Features](#key-features)
+5. [Safe Browsing and Content Redirection](#safe-browsing-and-content-redirection)
+6. [TinyFish API Integration](#tinyfish-api-integration)
+7. [How VeriScan Works](#how-veriscan-works)
+8. [System Architecture](#system-architecture)
+9. [Technology Stack](#technology-stack)
+10. [Project Structure](#project-structure)
+11. [Getting Started](#getting-started)
+12. [Environment Variables](#environment-variables)
+13. [Deployment](#deployment)
+14. [Security and Privacy](#security-and-privacy)
+15. [Future Scope](#future-scope)
+16. [Hackathon Experience](#hackathon-experience)
+17. [Contributing](#contributing)
+18. [Acknowledgements](#acknowledgements)
+19. [Contact](#contact)
+
+---
+
+## About the Project
+
+**VeriScan AI** is an AI-powered identity and document screening platform developed to explore smarter verification workflows and safer digital interactions.
 
 In today's digital world, users regularly interact with online platforms, external websites, documents, and digital information. Determining whether information and destinations can be trusted is increasingly important.
 
 VeriScan AI brings together the ideas of AI-assisted screening, web-connected intelligence, and safe browsing into one platform.
 
-The project also explores the use of TinyFish API to connect AI applications with live web information and automation capabilities.
+The project also explores the use of **TinyFish API** to connect AI applications with live web information and automation capabilities.
 
-Our vision: Make digital verification more intelligent and online interactions more informed.
+**Our vision:** Make digital verification more intelligent and online interactions more informed.
 
-Problem Statement
+## Problem Statement
 
 Digital users face several challenges when interacting with online information and verification systems:
 
@@ -60,7 +66,7 @@ Digital users face several challenges when interacting with online information a
 
 There is a need for an accessible platform that explores intelligent screening and safer navigation.
 
-Our Solution
+## Our Solution
 
 VeriScan AI aims to address these challenges through an integrated platform focused on:
 
@@ -72,9 +78,9 @@ VeriScan AI aims to address these challenges through an integrated platform focu
 
 Instead of treating verification and browsing as completely separate activities, VeriScan explores how they can work together to provide a more informed digital experience.
 
-Key Features
+## Key Features
 
-1. AI-Powered Identity and Document Screening
+### 1. AI-Powered Identity and Document Screening
 
 A dedicated screening experience focused on identity and document verification workflows.
 
@@ -83,7 +89,7 @@ A dedicated screening experience focused on identity and document verification w
 - Support for improving digital verification workflows.
 - Focus on making screening more accessible.
 
-2. Safe Browsing
+### 2. Safe Browsing
 
 A browsing-oriented feature designed to help users interact more carefully with external websites.
 
@@ -92,7 +98,7 @@ A browsing-oriented feature designed to help users interact more carefully with 
 - Awareness of suspicious destinations.
 - Controlled access to external content.
 
-3. Content Redirection
+### 3. Content Redirection
 
 Content redirection helps users navigate toward relevant external information while maintaining control over the destination.
 
@@ -102,7 +108,7 @@ Content redirection helps users navigate toward relevant external information wh
 - Protection against unsupported or malformed URL schemes.
 - Clear handling of potentially suspicious destinations.
 
-4. TinyFish-Powered Web Intelligence
+### 4. TinyFish-Powered Web Intelligence
 
 Integration with TinyFish API to explore live-web information retrieval and browser-based automation.
 
@@ -111,13 +117,13 @@ Integration with TinyFish API to explore live-web information retrieval and brow
 - AI-assisted web interactions.
 - Support for information-gathering workflows.
 
-5. Screening History Management
+### 5. Screening History Management
 
 - Clear Scan History functionality.
 - Improved management of screening activity.
 - Direct Sign Out functionality.
 
-6. User-Friendly Interface
+### 6. User-Friendly Interface
 
 - Dedicated VeriScan AI branding.
 - Simple navigation.
@@ -126,7 +132,7 @@ Integration with TinyFish API to explore live-web information retrieval and brow
 
 ---
 
-Safe Browsing and Content Redirection
+## Safe Browsing and Content Redirection
 
 One of the important aspects of VeriScan AI is its focus on safer web navigation.
 
@@ -134,8 +140,9 @@ Users frequently encounter external links while browsing online. Not every desti
 
 VeriScan aims to provide a controlled content-redirection experience.
 
-How It Works
+### How It Works
 
+```text
        User Interaction
               |
               v
@@ -162,8 +169,9 @@ How It Works
         |
         v
    External Content
+```
 
-Safe Browsing Principles
+### Safe Browsing Principles
 
 - Accept only supported HTTP and HTTPS destinations.
 - Reject malformed URLs and unsupported protocols.
@@ -172,29 +180,30 @@ Safe Browsing Principles
 - Provide users with clear destination information.
 - Treat external webpage content as untrusted data.
 
-Important: URL validation alone cannot guarantee that a website is legitimate or safe. A complete security assessment requires additional reputation and threat-detection checks.
+**Important:** URL validation alone cannot guarantee that a website is legitimate or safe. A complete security assessment requires additional reputation and threat-detection checks.
 
 ---
 
-TinyFish API Integration
+## TinyFish API Integration
 
 TinyFish is an important technology explored during AZINHACK 2026.
 
 It provides web-agent capabilities that allow applications to interact with live websites and retrieve useful information.
 
-Why TinyFish?
+### Why TinyFish?
 
 Traditional applications often depend on predefined data sources. Live-web interaction can help applications access more dynamic information.
 
 TinyFish provides capabilities such as:
 
-Capability| Purpose
-Web Search| Discover relevant online information
-Web Fetch| Retrieve webpage content
-Web Agent| Perform goal-oriented browser tasks
-Browser Automation| Interact with website interfaces
+| Capability | Purpose |
+|---|---|
+| Web Search | Discover relevant online information |
+| Web Fetch | Retrieve webpage content |
+| Web Agent | Perform goal-oriented browser tasks |
+| Browser Automation | Interact with website interfaces |
 
-Role in VeriScan AI
+### Role in VeriScan AI
 
 TinyFish is explored as a web-connected intelligence component.
 
@@ -206,7 +215,7 @@ Its potential role includes:
 4. Passing retrieved information into the application's processing workflow.
 5. Presenting relevant information to the user.
 
-Integration Considerations
+### Integration Considerations
 
 - API credentials should be stored securely.
 - External content should be treated as untrusted.
@@ -217,22 +226,23 @@ TinyFish does not independently guarantee that an external website is safe. Its 
 
 ---
 
-How VeriScan Works
+## How VeriScan Works
 
 The overall conceptual workflow:
 
-1. User Interaction: The user accesses the VeriScan AI platform.
-2. Screening Request: The user interacts with the available screening functionality.
-3. Information Processing: The application processes the relevant request.
-4. Web Intelligence: TinyFish can support connected web-information workflows.
-5. Safety Checks: External destinations can be evaluated through the safe-navigation workflow.
-6. Results: Relevant information is presented through the application interface.
-7. User Review: The user reviews the available information before taking further action.
+1. **User Interaction:** The user accesses the VeriScan AI platform.
+2. **Screening Request:** The user interacts with the available screening functionality.
+3. **Information Processing:** The application processes the relevant request.
+4. **Web Intelligence:** TinyFish can support connected web-information workflows.
+5. **Safety Checks:** External destinations can be evaluated through the safe-navigation workflow.
+6. **Results:** Relevant information is presented through the application interface.
+7. **User Review:** The user reviews the available information before taking further action.
 
 ---
 
-System Architecture
+## System Architecture
 
+```text
               USER
                 |
                 v
@@ -265,47 +275,51 @@ System Architecture
                 |
                 v
           USER INTERFACE
+```
 
-This diagram represents the conceptual architecture. Actual service connections should be confirmed against the deployed source code.
+*This diagram represents the conceptual architecture. Actual service connections should be confirmed against the deployed source code.*
 
 ---
 
-Technology Stack
+## Technology Stack
 
-Layer| Technology
-Application| VeriScan AI
-AI Integration| AI-assisted screening
-Web Intelligence| TinyFish API
-Hosting| Vercel
-Version Control| Git
-Repository| GitHub
+| Layer | Technology |
+|---|---|
+| Application | VeriScan AI |
+| AI Integration | AI-assisted screening |
+| Web Intelligence | TinyFish API |
+| Hosting | Vercel |
+| Version Control | Git |
+| Repository | GitHub |
 
 The exact frontend framework, backend framework, database and AI model should be documented according to the project's source-code configuration.
 
 ---
 
-Project Structure
+## Project Structure
 
 The current public repository contains the application directory and README.
 
 Conceptual organization:
 
+```text
 Veriscan/
 │
 ├── sih/
 │   └── Application files
 │
 └── README.md
+```
 
 The detailed internal folder structure depends on the application source files.
 
 ---
 
-Getting Started
+## Getting Started
 
 Follow these steps to obtain the project locally.
 
-Prerequisites
+### Prerequisites
 
 - Git
 - Node.js and npm, if required by the frontend
@@ -313,53 +327,65 @@ Prerequisites
 - Code editor such as VS Code
 - Required API credentials
 
-Step 1: Clone the Repository
+### Step 1: Clone the Repository
 
+```bash
 git clone https://github.com/Shekhar-Kumar576/Veriscan.git
+```
 
-Step 2: Navigate to the Project
+### Step 2: Navigate to the Project
 
+```bash
 cd Veriscan
+```
 
-Step 3: Install Dependencies
+### Step 3: Install Dependencies
 
 Navigate to the application directory and install dependencies using its package configuration.
 
 For an npm-based application:
 
+```bash
 npm install
+```
 
 For a Python-based backend, if present:
 
+```bash
 pip install -r requirements.txt
+```
 
-Step 4: Configure Environment Variables
+### Step 4: Configure Environment Variables
 
 Create the required environment configuration using the variable names expected by the application.
 
 See the Environment Variables section below.
 
-Step 5: Start the Application
+### Step 5: Start the Application
 
 Use the development commands defined in the project's configuration files.
 
 For an npm application, the command may be:
 
+```bash
 npm run dev
+```
 
 ---
 
-Environment Variables
+## Environment Variables
 
 VeriScan may require API credentials for its external integrations.
 
 Example configuration:
 
+```env
 TINYFISH_API_KEY=your_api_key
+```
 
 Add other environment variables only when required by the source code.
 
-Security guidelines:
+**Security guidelines:**
 
 - Never upload real API keys to GitHub.
 - Never hardcode private credentials in frontend code.
@@ -368,13 +394,13 @@ Security guidelines:
 
 ---
 
-Deployment
+## Deployment
 
 VeriScan AI is hosted on Vercel.
 
-Live Application: https://veriscan-seven.vercel.app/
+**Live Application:** https://veriscan-seven.vercel.app/
 
-Deployment Steps
+### Deployment Steps
 
 1. Push the latest project changes to GitHub.
 2. Open Vercel.
@@ -384,7 +410,7 @@ Deployment Steps
 6. Deploy the application.
 7. Test the live application and external API integrations.
 
-Deployment Verification
+### Deployment Verification
 
 After deployment, verify:
 
@@ -397,7 +423,7 @@ After deployment, verify:
 
 ---
 
-Security and Privacy
+## Security and Privacy
 
 Security and responsible data handling are important considerations for VeriScan AI.
 
@@ -414,7 +440,7 @@ AI-generated results should not be treated as official proof of identity. Users 
 
 ---
 
-Future Scope
+## Future Scope
 
 VeriScan AI has opportunities for further development.
 
@@ -434,9 +460,9 @@ Our long-term objective is to develop VeriScan into a more comprehensive platfor
 
 ---
 
-Hackathon Experience
+## Hackathon Experience
 
-VeriScan AI was developed and explored as part of AZINHACK 2026, organized by the Intel oneAPI Student Club (IoSC), GGSIPU East Delhi Campus.
+VeriScan AI was developed and explored as part of **AZINHACK 2026**, organized by the Intel oneAPI Student Club (IoSC), GGSIPU East Delhi Campus.
 
 Participating in this hackathon provided an opportunity to experiment with new technologies, explore TinyFish API integration, and understand the practical challenges involved in building AI-powered applications.
 
@@ -444,11 +470,11 @@ Although the project did not qualify for the next round, the experience contribu
 
 The journey reinforced an important lesson:
 
-Every hackathon is an opportunity to learn, experiment, improve and build something better.
+**Every hackathon is an opportunity to learn, experiment, improve and build something better.**
 
 ---
 
-Contributing
+## Contributing
 
 Contributions and suggestions are welcome.
 
@@ -462,7 +488,7 @@ If you would like to improve VeriScan AI:
 
 ---
 
-Acknowledgements
+## Acknowledgements
 
 Special thanks to:
 
@@ -473,15 +499,15 @@ Special thanks to:
 
 ---
 
-Contact
+## Contact
 
-Developer: Shekhar Kumar
+**Developer:** Shekhar Kumar
 
-GitHub: https://github.com/Shekhar-Kumar576
+**GitHub:** https://github.com/Shekhar-Kumar576
 
-Project Repository: https://github.com/Shekhar-Kumar576/Veriscan
+**Project Repository:** https://github.com/Shekhar-Kumar576/Veriscan
 
-Live Application: https://veriscan-seven.vercel.app/
+**Live Application:** https://veriscan-seven.vercel.app/
 
 ---
 
